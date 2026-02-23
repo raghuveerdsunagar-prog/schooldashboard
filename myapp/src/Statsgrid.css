@@ -1,0 +1,18 @@
+.card-container{
+    display: flex;
+    flex-wrap:nowrap;
+    justify-content: center;
+ 
+
+
+
+}
+
+
+.card{
+    background: url(./assets/white.jpg);
+    height: auto;
+    width: auto;
+
+    
+}
