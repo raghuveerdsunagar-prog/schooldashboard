@@ -1,7 +1,7 @@
 import "./App.css";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import StatsGrid from "./StatsGrid";
-import Dashboard from "./dashboard";
+import Dashboard from "./Dashboard";
 import Adminlogin from "./Admin";
 function App() {
   return (
