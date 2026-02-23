@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import Summary from "./summary";
-import TeacherSelector from "./TeacherSelector";
+import TeacherSelector from "./Teacherselector";
 import WeeklyChart from "./Weeklycharts";
 import ActivitiesPie from "./ActivitiesPie";
 import DashboardHeader from "./Dashboardheader";
