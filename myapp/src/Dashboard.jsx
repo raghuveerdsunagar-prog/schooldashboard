@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
-import Summary from "./Summary";
+import Summary from "./summary";
 import TeacherSelector from "./TeacherSelector";
 import WeeklyChart from "./Weeklycharts";
 import ActivitiesPie from "./ActivitiesPie";
