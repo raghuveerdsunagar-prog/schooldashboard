@@ -1,122 +1,72 @@
-import React, { useState, useEffect } from "react";
-import axios from "axios";
-import Summary from "./summary";
-import Teacherselector from "./Teacherselector";
-import WeeklyChart from "./Weeklycharts";
-import ActivitiesPie from "./ActivitiesPie";
-import DashboardHeader from "./Dashboardheader";
-import { useNavigate } from "react-router-dom";
-import "./Dash.css"
-function Dashboard() {
-  const [summary, setSummary] = useState([]);
-  const [teachers, setTeachers] = useState([]);
-  const [trends, setTrends] = useState([]);
-  const [selectedTeacher, setSelectedTeacher] = useState(""); // track selection
-  const navigate = useNavigate();
+const express = require("express");
+const cors = require("cors");
+const dotenv = require("dotenv");
+const jwt = require("jsonwebtoken");
+const mysql = require("mysql2");
 
-  useEffect(() => {
+dotenv.config();
 
-    const token = localStorage.getItem("token");
-    const role = localStorage.getItem("role");
+const app = express();
+app.use(express.json());
 
-    console.log("Token:", localStorage.getItem("token"));
-console.log("Role:", localStorage.getItem("role"));
+// ✅ Allow both local dev and Vercel frontend
+app.use(cors({
+  origin: [
+    "http://localhost:3000",
+    "https://your-frontend.vercel.app" // replace with your actual Vercel domain
+  ],
+  methods: ["GET", "POST", "PUT", "DELETE"],
+  credentials: true
+}));
 
+// ✅ Database connection (use DB_URL env variable from Render)
+const db = mysql.createConnection(process.env.DB_URL);
 
-    if (!token || role !== "admin") {
-      alert("Access Denied! Admin login required.");
-      navigate("/adminlog");
-      return;
-    }
+db.connect(err => {
+  if (err) {
+    console.error("❌ Database connection failed:", err.stack);
+    return;
+  }
+  console.log("✅ Connected to database.");
+});
 
+// ✅ Example protected route
+app.post("/adminlogin", (req, res) => {
+  const { username, password } = req.body;
 
-    axios.defaults.headers.common["Authorization"] = `Bearer ${token}`;
+  // Example login logic (replace with real DB query)
+  if (username === "admin" && password === "admin123") {
+    const token = jwt.sign({ role: "admin" }, process.env.JWT_SECRET, { expiresIn: "1h" });
+    return res.json({ token, role: "admin" });
+  }
 
-    axios.get("http://localhost:3001/api/summary")
-      .then(res => setSummary(res.data))
-      .catch(err => console.error(err));
+  res.status(401).json({ error: "Invalid credentials" });
+});
 
-    axios.get("http://localhost:3001/api/teachers")
-      .then(res => setTeachers(res.data))
-      .catch(err => console.error(err));
+// ✅ Example APIs
+app.get("/api/summary", (req, res) => {
+  db.query("SELECT * FROM summary", (err, results) => {
+    if (err) return res.status(500).json({ error: err.message });
+    res.json(results);
+  });
+});
 
-    axios.get("http://localhost:3001/api/weekly-trends")
-      .then(res => setTrends(res.data))
-      .catch(err => console.error(err));
-  }, [navigate]);
+app.get("/api/teachers", (req, res) => {
+  db.query("SELECT * FROM teachers", (err, results) => {
+    if (err) return res.status(500).json({ error: err.message });
+    res.json(results);
+  });
+});
 
- 
+app.get("/api/weekly-trends", (req, res) => {
+  db.query("SELECT * FROM weekly_trends", (err, results) => {
+    if (err) return res.status(500).json({ error: err.message });
+    res.json(results);
+  });
+});
 
-  // Filter summary by selected teacher
-  const filteredSummary = selectedTeacher
-    ? summary.filter(t => t.teacher_id === selectedTeacher)
-    : [];
-
-  return (
-    <div>
-      <h2>Teacher Insights Dashboard</h2>
-
-
-{/* LOGOUT BUTTON - Add here */}
-<div className="logout">
-  <button className="lgout"
-    onClick={() => {
-      localStorage.removeItem("token");
-      localStorage.removeItem("role");
-      window.location.href = '/adminlog';
-    }}
- 
-  >
-    🚪 Logout
-  </button>
-</div>
-
-
-
-
-      <DashboardHeader/>
-      
-
-      {/* Teacher Selector */}
-      <Teacherselector teachers={teachers} onSelect={setSelectedTeacher} />
-
-      {/* Summary Cards */}
-      <div className="cards">
-        {filteredSummary.map((teacher, index) => (
-          <Summary key={index} summary={teacher} />
-        ))}
-      </div>
-
-      
-   <div className="charts">
-    <ActivitiesPie summary={filteredSummary[0]} />
-
-      {/* Weekly Trends Chart */}
-      <WeeklyChart trends={trends}  selectedTeacher={selectedTeacher}/>
-    </div>    
-
-
-
-
-      <footer className="dashboard-footer">
-        <div className="footer-content">
-          <div className="footer-section">
-            <h4>Savra Insights</h4>
-            <p>Empowering educators with data-driven insights</p>
-          </div>
-          <div className="footer-section">
-            <h4>Quick Actions</h4>
-        
-          </div>
-          <div className="footer-section">
-            <h4>© 2026 Savra Technologies</h4>
-            <p>All rights reserved | Version 1.0</p>
-          </div>
-        </div>
-      </footer>
-    </div>
-  );
-}
-
-
-export default Dashboard;
+// ✅ Start server
+const PORT = process.env.PORT || 3001;
+app.listen(PORT, () => {
+  console.log(`🚀 Backend running on port ${PORT}`);
+});
