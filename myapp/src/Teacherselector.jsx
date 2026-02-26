@@ -1,6 +1,6 @@
 import React from "react";
 
-function TeacherSelector({ teachers, onSelect }) {
+function Teacherselector({ teachers, onSelect }) {
   return (
     <div>
       <h3>Select Teacher</h3>
@@ -16,4 +16,4 @@ function TeacherSelector({ teachers, onSelect }) {
   );
 }
 
-export default TeacherSelector;
+export default Teacherselector;
