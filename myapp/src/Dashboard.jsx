@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import Summary from "./summary";
-import TeacherSelector from "./Teacherselector";
+import Teacherselector from "./Teacherselector";
 import WeeklyChart from "./Weeklycharts";
 import ActivitiesPie from "./ActivitiesPie";
 import DashboardHeader from "./Dashboardheader";
@@ -78,7 +78,7 @@ console.log("Role:", localStorage.getItem("role"));
       
 
       {/* Teacher Selector */}
-      <TeacherSelector teachers={teachers} onSelect={setSelectedTeacher} />
+      <Teacherselector teachers={teachers} onSelect={setSelectedTeacher} />
 
       {/* Summary Cards */}
       <div className="cards">
